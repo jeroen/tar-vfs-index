@@ -2,6 +2,8 @@
 
 Generates a file index with raw offsets of a tarball, using the same format as [emscripten file packager](https://emscripten.org/docs/porting/files/packaging_files.html#packaging-using-the-file-packager-tool). This this metadata can be used to mount the tar blob in Emscripten's [WORKERFS](https://emscripten.org/docs/api_reference/Filesystem-API.html#id2) virtual filesystem without extracting it.
 
+For a longer intro see this blog post: [Mounting tar archives as a filesystem in WebAssembly](https://jeroen.github.io/notes/webassembly-tar/)
+
 ## Installation
 
 ```sh

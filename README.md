@@ -54,17 +54,23 @@ The `start` and `end` values are byte offsets within the **decompressed** tar st
 
 ## Use with Emscripten WORKERFS
 
-Emscripten's [WORKERFS](https://emscripten.org/docs/api_reference/Filesystem-API.html#id2) filesystem lets you mount an filesystem image inside a web worker, giving compiled C/C++ code read-only access to its files without copying. Mounting an image requires a `metadata` JSON object (normally produced by `file_packager --separate-metadata`) alongside a `Blob` of the raw archive data.
+Emscripten's [WORKERFS](https://emscripten.org/docs/api_reference/Filesystem-API.html#id2) filesystem lets you mount a vfs image inside a web worker, giving compiled C/C++ code read-only access to its files without copying. Mounting an image requires a `metadata` JSON object (normally produced by `file_packager --separate-metadata`) alongside a `Blob` of the raw archive data.
 
-`tarindex` generates this metadata object for a tar archive:
+`tarindex` generates this metadata object for a tar archive. Note that if your tar file is gzipped (`tar.gz`) you should use the browser-native [DecompressionStream](https://developer.mozilla.org/en-US/docs/Web/API/DecompressionStream) to get the blob of the uncompressed tarball.
+
 
 ```js
-const [metaRes, blobRes] = await Promise.all([
+const [metaRes, dataRes] = await Promise.all([
   fetch('archive.tar.gz.json'),  // output of tarindex
   fetch('archive.tar.gz'),
 ]);
 const metadata = await metaRes.json();
-const blob = await blobRes.blob();
+
+// WORKERFS slices the blob using the offsets in metadata, which refer to
+// positions in the decompressed tar stream, so decompress before mounting.
+const blob = await new Response(
+  dataRes.body.pipeThrough(new DecompressionStream('gzip'))
+).blob();
 
 FS.mkdir('/pkg');
 FS.mount(WORKERFS, { packages: [{ metadata, blob }] }, '/pkg');

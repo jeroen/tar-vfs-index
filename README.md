@@ -1,6 +1,6 @@
 # tar-vfs-index
 
-Generates a file index with raw offsets of a tarball, using the [emscripten file packager](https://emscripten.org/docs/porting/files/packaging_files.html#packaging-using-the-file-packager-tool) format. This this metadata can be used to mount the tar blob in Emscripten's [WORKERFS](https://emscripten.org/docs/api_reference/Filesystem-API.html#id2) virtual filesystem without extracting it.
+Generates a file index with raw offsets of a tarball, using the same format as [emscripten file packager](https://emscripten.org/docs/porting/files/packaging_files.html#packaging-using-the-file-packager-tool). This this metadata can be used to mount the tar blob in Emscripten's [WORKERFS](https://emscripten.org/docs/api_reference/Filesystem-API.html#id2) virtual filesystem without extracting it.
 
 ## Installation
 

@@ -1,7 +1,7 @@
 {
   "name": "tar-vfs-index",
   "version": "1.0.0",
-  "description": "Index files in a tar, tar.gz, or tar.zst stream, recording filenames and byte offsets",
+  "description": "Index files in a tar, tar.gz, or tar.zst stream, recording filenames and byte offsets, for use with Emscripten WORKERFS",
   "type": "module",
   "main": "index.js",
   "exports": "./index.js",
@@ -21,6 +21,13 @@
   },
   "engines": {
     "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jeroen/tar-vfs-index.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jeroen/tar-vfs-index/issues"
   },
   "license": "MIT"
 }

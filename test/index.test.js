@@ -87,6 +87,41 @@ test('cli reads from stdin when no file argument is given', async () => {
   check_result(result);
 });
 
+test('cli --append embeds .vfs-index.json and valid 16-byte hint', async () => {
+  const buf = await create_tar_buffer();
+  const gz = zlib.gzipSync(buf);
+
+  const result = await new Promise((resolve, reject) => {
+    const proc = spawn(process.execPath, [CLI, '--append'], {stdio: ['pipe', 'pipe', 'pipe']});
+    const chunks = [];
+    proc.stdout.on('data', chunk => chunks.push(chunk));
+    proc.stderr.on('data', chunk => reject(new Error(Buffer.concat([chunk]).toString())));
+    proc.on('close', code => {
+      if (code !== 0) return reject(new Error(`CLI exited with code ${code}`));
+      resolve(Buffer.concat(chunks));
+    });
+    proc.stdin.end(gz);
+  });
+
+  // Result must be valid gzip
+  const decompressed = zlib.gunzipSync(result);
+
+  // Hint is the last 16 bytes of the decompressed tar
+  const view = new DataView(decompressed.buffer, decompressed.byteOffset, decompressed.byteLength);
+  const magic = view.getInt32(decompressed.length - 16);
+  const block = view.getInt32(decompressed.length - 8);
+  const len   = view.getInt32(decompressed.length - 4);
+
+  assert.equal(magic, 2003133010); // "webR"
+  assert.ok(block > 0);
+  assert.ok(len > 0);
+
+  // The referenced block must contain valid JSON matching the original index
+  const jsonBytes = decompressed.subarray(512 * block, 512 * block + len);
+  const metadata = JSON.parse(jsonBytes.toString('utf8'));
+  check_result(metadata);
+});
+
 test('all three variants produce identical output', async () => {
   const buf = await create_tar_buffer();
   const gz = zlib.gzipSync(buf);

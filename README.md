@@ -1,6 +1,6 @@
 # tarindex
 
-Index files in a `.tar`, `.tar.gz`, or `.tar.zst` archive, recording filenames and byte offsets. Input type is detected automatically.
+Generates a file index with raw offsets of a tarball, using the [emscripten file packager](https://emscripten.org/docs/porting/files/packaging_files.html#packaging-using-the-file-packager-tool) format. This this metadata can be used to mount the tar blob in Emscripten's [WORKERFS](https://emscripten.org/docs/api_reference/Filesystem-API.html#id2) virtual filesystem without extracting it.
 
 ## Installation
 
@@ -13,6 +13,7 @@ npm install tarindex
 ```sh
 npx tarindex archive.tar.gz
 npx tarindex archive.tar.zst [output.json]
+npx tarindex --append archive.tar.gz
 ```
 
 If no input file is given, stdin is used:
@@ -53,9 +54,9 @@ The `start` and `end` values are byte offsets within the **decompressed** tar st
 
 ## Use with Emscripten WORKERFS
 
-Emscripten's [WORKERFS](https://emscripten.org/docs/api_reference/Filesystem-API.html#id2) filesystem lets you mount a tar archive inside a web worker, giving compiled C/C++ code read-only access to its files without copying the entire archive into memory. Mounting a package requires a `metadata` JSON object (normally produced by `file_packager --separate-metadata`) alongside a `Blob` of the raw archive data.
+Emscripten's [WORKERFS](https://emscripten.org/docs/api_reference/Filesystem-API.html#id2) filesystem lets you mount an filesystem image inside a web worker, giving compiled C/C++ code read-only access to its files without copying. Mounting an image requires a `metadata` JSON object (normally produced by `file_packager --separate-metadata`) alongside a `Blob` of the raw archive data.
 
-`tarindex` generates that metadata object directly from the tar archive:
+`tarindex` generates this metadata object for a tar archive:
 
 ```js
 const [metaRes, blobRes] = await Promise.all([
@@ -67,4 +68,12 @@ const blob = await blobRes.blob();
 
 FS.mkdir('/pkg');
 FS.mount(WORKERFS, { packages: [{ metadata, blob }] }, '/pkg');
+```
+
+## Embedding the index in the archive itself
+
+The `--append` flag embeds the index directly into the archive as a `.vfs-index.json` entry, followed by a 16-byte lookup hint. This produces a self-contained `.tar.gz` that can be mounted by [webR](https://docs.r-wasm.org/webr/latest/) without a separate metadata file:
+
+```sh
+npx tarindex --append archive.tar.gz          # modifies the file in-place
 ```

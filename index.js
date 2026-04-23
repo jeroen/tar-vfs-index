@@ -20,7 +20,7 @@ function index_tar_stream(input) {
   const extract = tar.extract({allowUnknownFormat: true}).on('entry', process_entry);
   return pipeline(input, extract).catch(function(err) {
     if (files.length > 0 && err.message.includes('Unexpected end')) {
-      return true; // workaround tar-stream error for webr 0.4.2 trailing junk
+      return true; // workaround tar-stream error not liking our 'hint'
     } else {
       throw new Error(err);
     }

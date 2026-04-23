@@ -1,12 +1,12 @@
 {
-  "name": "tarindex",
+  "name": "tar-vfs-index",
   "version": "1.0.0",
   "description": "Index files in a tar, tar.gz, or tar.zst stream, recording filenames and byte offsets",
   "type": "module",
   "main": "index.js",
   "exports": "./index.js",
   "bin": {
-    "tarindex": "bin/cli.js"
+    "tar-vfs-index": "bin/cli.js"
   },
   "scripts": {
     "test": "node --test"

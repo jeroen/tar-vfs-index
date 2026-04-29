@@ -1,6 +1,6 @@
 {
   "name": "tar-vfs-index",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Index files in a tar, tar.gz, or tar.zst stream, recording filenames and byte offsets, for use with Emscripten WORKERFS",
   "type": "module",
   "main": "index.js",
@@ -17,7 +17,7 @@
   ],
   "dependencies": {
     "file-type": "^21.0.0",
-    "tar-stream": "^3.1.8"
+    "tar-stream": "^3.2.0"
   },
   "engines": {
     "node": ">=18"

@@ -10,8 +10,8 @@ function index_tar_stream(input) {
     if (header.size > 0 && header.name.match(/\/.*/)) {
       files.push({
         filename: header.name,
-        start: extract._buffer.shifted,
-        end: extract._buffer.shifted + header.size
+        start: header.byteOffset,
+        end: header.byteOffset + header.size
       });
     }
     stream.resume();
